@@ -83,6 +83,41 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 	return logs, nil
 }
 
+func (l *LogEntry) Paginate(limit, offset int64) ([]*LogEntry, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	collection := client.Database("logs").Collection("logs")
+
+	opts := options.Find()
+	opts.SetSort(bson.D{{"created_at", -1}})
+  opts.SetLimit(limit)
+  opts.SetSkip(limit * (offset - 1))
+
+	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
+	if err != nil {
+		log.Println("Finding all docs error:", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var logs []*LogEntry
+
+	for cursor.Next(ctx) {
+		var item LogEntry
+
+		err := cursor.Decode(&item)
+		if err != nil {
+			log.Print("Error decoding log into slice:", err)
+			return nil, err
+		} else {
+			logs = append(logs, &item)
+		}
+	}
+
+	return logs, nil
+}
+
 func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()

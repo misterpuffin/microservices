@@ -48,32 +48,25 @@ func main() {
 		Models: data.New(client),
 	}
 
+  // start gRPC server
+  go app.gRPCListen(gRpcPort)
+
 	// start web server
-	// go app.serve()
+	go app.serve()
 	log.Println("Starting service on port", webPort)
+}
+
+func (app *Config) serve() {
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", webPort),
+		Addr: fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
-	err = srv.ListenAndServe()
+	err := srv.ListenAndServe()
 	if err != nil {
 		log.Panic()
 	}
-
 }
-
-// func (app *Config) serve() {
-// 	srv := &http.Server{
-// 		Addr: fmt.Sprintf(":%s", webPort),
-// 		Handler: app.routes(),
-// 	}
-
-// 	err := srv.ListenAndServe()
-// 	if err != nil {
-// 		log.Panic()
-// 	}
-// }
 
 func connectToMongo() (*mongo.Client, error) {
 	// create connection options

@@ -16,8 +16,10 @@ protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=p
 ```
 
 1. Define protobuf
-2. Compile
+2. Compile and generate code
 3. Write server code
 4. Write client code
+
+## Task: Add List Logs via gRPC functionality in broker-service
 
 

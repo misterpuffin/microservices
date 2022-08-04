@@ -13,5 +13,9 @@ docker stack deploy -c swarm.yml myapp
 
 To scale up a service
 ```console
-docker service scale myapp_listerner-service=3
+docker service scale myapp_logger-service=3
+```
+To update a service
+```console
+docker service update --image misterpuffin/logger-service:1.0.1 myapp_logget-service
 ```

@@ -1,10 +1,18 @@
 version: '3'
 
 services:
+  front-end:
+    image: misterpuffin/front-end:1.0.0
+    ports:
+      - "3000:3000"
+    deploy:
+      mode: replicated
+      replicas: 1
+
   broker-service:
     image: misterpuffin/broker-service:1.0.0
     ports:
-      - "8080:80"
+      - "8080:8080"
     deploy:
       mode: replicated
       replicas: 1

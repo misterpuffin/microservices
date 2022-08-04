@@ -243,38 +243,14 @@ func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) ListLogsViaGRPC(w http.ResponseWriter, r *http.Request) {
-  var requestPayload RequestPayload
-  
-  err := app.readJSON(w, r, &requestPayload) 
-  if err != nil {
-    app.errorJSON(w, err)
-    return
-  }
+  // TODO 2
+  // Read JSON payload
 
-  conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
-  if err != nil {
-    app.errorJSON(w, err)
-    return
-  }
-  defer conn.Close()
+  // Connect to gRPC server
 
-  c := logs.NewLogServiceClient(conn)
-  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-  defer cancel()
+  // Create new gRPC client
 
-  response, err := c.ListLogs(ctx, &logs.ListRequest{
-    ResultsPerPage: requestPayload.List.ResultsPerPage,
-    PageNumber: requestPayload.List.PageNumber,
-  })
-  if err != nil {
-    app.errorJSON(w, err)
-    return
-  }
+  // Call function with gRPC client
 
-  var payload jsonResponse
-  payload.Error = false
-  payload.Message = "success"
-  payload.Data = response.Logs
-  
-  app.writeJSON(w, http.StatusAccepted, payload)
+  // Return json response
 }

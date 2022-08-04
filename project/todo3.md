@@ -19,3 +19,7 @@ To update a service
 ```console
 docker service update --image misterpuffin/logger-service:1.0.1 myapp_logget-service
 ```
+
+## Task: To update logger-service image from v1.0.0 to v1.0.1 with little downtime
+
+

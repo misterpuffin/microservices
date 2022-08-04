@@ -92,7 +92,7 @@ func (l *LogEntry) Paginate(limit, offset int64) ([]*LogEntry, error) {
 	opts := options.Find()
 	opts.SetSort(bson.D{{"created_at", -1}})
   opts.SetLimit(limit)
-  opts.SetSkip(limit * (offset - 1))
+  opts.SetSkip(limit * offset)
 
 	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
 	if err != nil {

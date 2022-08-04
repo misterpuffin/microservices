@@ -39,6 +39,8 @@ func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.L
 func (l *LogServer) ListLogs(ctx context.Context, req *logs.ListRequest) (*logs.ListResponse, error) {
   resultsPerPage := req.GetResultPerPage()
   pageNumber := req.GetPageNumber()
+  log.Println("hello")
+  log.Println(resultsPerPage)
 
   results, err := l.Models.LogEntry.Paginate(resultsPerPage, pageNumber)
   if err != nil {
@@ -47,17 +49,17 @@ func (l *LogServer) ListLogs(ctx context.Context, req *logs.ListRequest) (*logs.
   }
 
   payload := []*logs.Log{}
-  for _, log := range results {
-    payload = append(payload, &logs.Log{Name: log.Name, Data: log.Data})
+  for _, v := range results {
+    payload = append(payload, &logs.Log{Name: v.Name, Data: v.Data})
   }
 
   res := &logs.ListResponse{Logs: payload, Result: "success"}
   return res, nil
 }
 
-func (app *Config) gRPCListen(port string) {
+func (app *Config) gRPCListen() {
   // Listen to TCP connections on the port
-  lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
+  lis, err := net.Listen("tcp", fmt.Sprintf(":%s", gRpcPort))
   if err != nil {
     log.Fatalf("Failed to listen for gRPC: %v", err)
   }
@@ -68,7 +70,7 @@ func (app *Config) gRPCListen(port string) {
   // Register our Log Service with the gRPC server
   logs.RegisterLogServiceServer(s, &LogServer{Models: app.Models})
 
-  log.Printf("gRPC Server started on port %s", port)
+  log.Printf("gRPC Server started on port %s", gRpcPort)
 
   // Serve the gRPC server
   if err := s.Serve(lis); err != nil {

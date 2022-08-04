@@ -49,10 +49,10 @@ func main() {
 	}
 
   // start gRPC server
-  go app.gRPCListen(gRpcPort)
+  go app.gRPCListen()
 
 	// start web server
-	go app.serve()
+	app.serve()
 	log.Println("Starting service on port", webPort)
 }
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -18,6 +19,7 @@ type RequestPayload struct {
 	Auth   AuthPayload `json:"auth,omitempty"`
 	Log    LogPayload  `json:"log,omitempty"`
 	Mail   MailPayload `json:"mail,omitempty"`
+  List   ListPayload `json:"list,omitempty"`
 }
 
 type MailPayload struct {
@@ -35,6 +37,11 @@ type AuthPayload struct {
 type LogPayload struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
+}
+
+type ListPayload struct {
+	ResultsPerPage int64 `json:"resultsPerPage"`
+	PageNumber int64 `json:"pageNumber"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -204,13 +211,14 @@ func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials(), grpc.WithBlock()))
+  conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
   if err != nil {
     app.errorJSON(w, err)
     return
   }
   defer conn.Close()
 
+  log.Printf("HELLO")
   c := logs.NewLogServiceClient(conn)
   ctx, cancel := context.WithTimeout(context.Background(), time.Second)
   defer cancel()
@@ -230,6 +238,43 @@ func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
   var payload jsonResponse
   payload.Error = false
   payload.Message = "logged"
-   
+  
+  app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) ListLogsViaGRPC(w http.ResponseWriter, r *http.Request) {
+  var requestPayload RequestPayload
+  
+  err := app.readJSON(w, r, &requestPayload) 
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+  defer conn.Close()
+
+  c := logs.NewLogServiceClient(conn)
+  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+  defer cancel()
+
+  response, err := c.ListLogs(ctx, &logs.ListRequest{
+    ResultPerPage: requestPayload.List.ResultsPerPage,
+    PageNumber: requestPayload.List.PageNumber,
+  })
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  var payload jsonResponse
+  payload.Error = false
+  payload.Message = "success"
+  payload.Data = response.Logs
+  
   app.writeJSON(w, http.StatusAccepted, payload)
 }

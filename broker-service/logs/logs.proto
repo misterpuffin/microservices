@@ -19,7 +19,7 @@ message LogResponse {
 
 message ListRequest {
   int64 page_number = 1;
-  int64 result_per_page = 2;
+  int64 results_per_page = 2;
 }
 
 message ListResponse {

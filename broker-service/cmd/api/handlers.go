@@ -263,7 +263,7 @@ func (app *Config) ListLogsViaGRPC(w http.ResponseWriter, r *http.Request) {
   defer cancel()
 
   response, err := c.ListLogs(ctx, &logs.ListRequest{
-    ResultPerPage: requestPayload.List.ResultsPerPage,
+    ResultsPerPage: requestPayload.List.ResultsPerPage,
     PageNumber: requestPayload.List.PageNumber,
   })
   if err != nil {

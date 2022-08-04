@@ -37,10 +37,8 @@ func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.L
 }
 
 func (l *LogServer) ListLogs(ctx context.Context, req *logs.ListRequest) (*logs.ListResponse, error) {
-  resultsPerPage := req.GetResultPerPage()
+  resultsPerPage := req.GetResultsPerPage()
   pageNumber := req.GetPageNumber()
-  log.Println("hello")
-  log.Println(resultsPerPage)
 
   results, err := l.Models.LogEntry.Paginate(resultsPerPage, pageNumber)
   if err != nil {

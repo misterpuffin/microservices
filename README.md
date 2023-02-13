@@ -13,6 +13,7 @@ should checkout to the other branches to see the solution and try out the newer 
 
 ### Task 1: Add mail-service to docker compose file
 ### Task 2: Implement gRPC in our app
+### Task 3: Deployment with Docker Swarm
 
 
 ## Navigating the application
